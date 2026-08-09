@@ -68,18 +68,18 @@ def analyze_dataframe(
     """
     data_summary = summarize_dataframe(df, n_recent=n_recent)
 
-    default_system = (
+    default_prompt = (
         "Du bist ein Analyst fuer Finanz-Zeitreihen. Du bekommst statistische "
         "Kennzahlen und die juengsten Datenpunkte einer Aktie inkl. technischer "
         "Indikatoren. Antworte praezise und begruende deine Einschaetzung anhand "
         "der konkreten Zahlen. Gib keine Anlageempfehlung, sondern eine "
-        "sachliche Einordnung der Daten."
+        "sachliche/wissenschaftliche Einordnung der Daten."
     )
 
     response = CLIENT.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": system_prompt or default_system},
+            {"role": "system", "content": system_prompt or default_prompt},
             {"role": "user", "content": f"{data_summary}\n\nFrage: {question}"},
         ],
     )
