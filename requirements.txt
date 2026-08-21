@@ -191,3 +191,4 @@ hpack==4.2.0
 hyperframe==6.1.0
 portalocker==3.2.0
 qdrant-client==1.19.0
+python-dotenv==1.2.3
