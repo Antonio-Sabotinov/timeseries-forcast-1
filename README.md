@@ -99,6 +99,28 @@ All models run **locally via Ollama** (CPU inference), no cloud API costs involv
 
 Requirement: [Ollama](https://ollama.com) installed locally, desired models pulled via `ollama pull <model>`.
 
+### SEC fundamentals
+
+The first fundamentals slice is available through importable APIs. It fetches
+SEC `companyfacts`, caches raw responses locally, normalizes a small core metric
+set, preserves filing accession numbers, and builds bounded context for Ollama.
+
+```python
+from core.fundamentals import evaluate_portfolio, evaluate_ticker
+from core.llm_analysis import analyze_fundamental_report
+
+company = evaluate_ticker("AAPL")
+portfolio = evaluate_portfolio(["AAPL", "MSFT", "NVDA"])
+answer = analyze_fundamental_report(
+	company,
+	"Which fundamental trends and data-quality warnings are visible?",
+)
+```
+
+SEC requests require a descriptive User-Agent with a reachable contact address.
+The implementation uses comparable 10-K and 10-Q duration facts and reports
+unsupported or missing metrics as quality flags instead of silently estimating.
+
 ### ⚠️ Disclaimer
 
 This project is intended **for testing and learning purposes only**. It does **not constitute financial advice** and should not be used as a basis for real investment decisions. All predictions are based on experimental models with no guarantee of accuracy.

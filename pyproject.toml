@@ -31,4 +31,4 @@ build-backend = "setuptools.build_meta"
 # Falls du spaeter weitere Top-Level-Ordner mit __init__.py hinzufuegst (z.B. "models"),
 # einfach in der Liste ergaenzen.
 [tool.setuptools]
-packages = ["utils"]
+packages = ["core", "core.fundamentals"]

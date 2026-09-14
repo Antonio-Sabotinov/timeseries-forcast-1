@@ -18,6 +18,8 @@ Voraussetzungen:
 import pandas as pd
 from openai import OpenAI
 
+from core.fundamentals.context import build_fundamental_context
+
 CLIENT = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
 
 
@@ -81,6 +83,30 @@ def analyze_dataframe(
         messages=[
             {"role": "system", "content": system_prompt or default_prompt},
             {"role": "user", "content": f"{data_summary}\n\nFrage: {question}"},
+        ],
+    )
+    return response.choices[0].message.content
+
+
+def analyze_fundamental_report(
+    report: dict,
+    question: str,
+    model: str = "llama3.2",
+    system_prompt: str | None = None,
+) -> str:
+    """Send a bounded SEC fundamentals report to Ollama."""
+    context = build_fundamental_context(report)
+    default_prompt = (
+        "Du bist ein Analyst fuer Unternehmensfundamentaldaten. Nutze nur die "
+        "bereitgestellten SEC-Daten und Quellen. Trenne beobachtete Fakten von "
+        "Interpretationen, nenne Datenqualitaetswarnungen und gib keine "
+        "Anlageempfehlung. Erfinde keine fehlenden Werte."
+    )
+    response = CLIENT.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt or default_prompt},
+            {"role": "user", "content": f"SEC-Fundamentalkontext:\n{context}\n\nFrage: {question}"},
         ],
     )
     return response.choices[0].message.content
