@@ -51,7 +51,7 @@ Voraussetzung: [Ollama](https://ollama.com) lokal installiert, gewünschte Model
 
 ### ⚠️ Hinweis / Disclaimer
 
-Dieses Projekt dient **ausschließlich Test- und Lernzwecken**. Es stellt **keine Finanzberatung** dar und sollte nicht als Grundlage für reale Anlageentscheidungen verwendet werden. Alle Vorhersagen basieren auf experimentellen Modellen ohne Garantie auf Richtigkeit.
+Dieses Projekt dient **ausschließlich Test- und Lernzwecken**. Die verwendeten Kurs- und Fundamentaldaten werden aus öffentlich verfügbaren Online-Quellen bezogen und sind möglicherweise nicht vollständig, aktuell oder dauerhaft verfügbar. Das Projekt stellt **keine Finanzberatung** dar und sollte nicht als Grundlage für reale Anlageentscheidungen verwendet werden. Alle Vorhersagen basieren auf experimentellen Modellen ohne Garantie auf Richtigkeit.
 
 ---
 
@@ -123,7 +123,7 @@ unsupported or missing metrics as quality flags instead of silently estimating.
 
 ### ⚠️ Disclaimer
 
-This project is intended **for testing and learning purposes only**. It does **not constitute financial advice** and should not be used as a basis for real investment decisions. All predictions are based on experimental models with no guarantee of accuracy.
+This project is intended **for testing and learning purposes only**. The market and fundamental data used are obtained from publicly available online sources and may be incomplete, outdated, or unavailable at any time. This project does **not constitute financial advice** and should not be used as a basis for real investment decisions. All predictions are based on experimental models with no guarantee of accuracy.
 
 ---
 
