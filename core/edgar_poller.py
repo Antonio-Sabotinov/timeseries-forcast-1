@@ -1,7 +1,8 @@
-"""
-EDGAR-Poller mit persistiertem Zustand: Ticker -> CIK -> Filings (10-K/10-Q/8-K)
-Notebook-importierbar, kein CLI. SQLite-basierte Historie fuer Diff-Erkennung
-und spaetere Fundamentaldaten-Zeitreihenbetrachtung.
+"""EDGAR poller with persisted state for filings and filing history.
+
+The module is importable from notebooks and is not a command-line interface.
+It stores filing history in SQLite so new filings can be detected and later
+used for fundamental-data time-series analysis.
 """
 import requests
 import json
@@ -11,7 +12,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from datetime import datetime, timezone
 
-HEADERS = {"User-Agent": "Antonio Research antonio@example.com"}  # anpassen!
+HEADERS = {"User-Agent": "Antonio Research antonio@example.com"}  # Customize this.
 TICKER_MAP_URL = "https://www.sec.gov/files/company_tickers.json"
 CACHE_PATH = Path.home() / ".cache" / "edgar_ticker_map.json"
 DB_PATH = Path.home() / "projects" / "timeseries-project" / "data" / "edgar_filings.db"
@@ -55,7 +56,7 @@ def _document_to_text(content: bytes, encoding: str | None = None) -> str:
 
 
 def _load_ticker_map(force_refresh: bool = False) -> dict:
-    """Lädt Ticker->CIK Mapping, cached lokal (Datei ändert sich selten)."""
+    """Load and locally cache the ticker-to-CIK mapping."""
     if CACHE_PATH.exists() and not force_refresh:
         return json.loads(CACHE_PATH.read_text())
 
@@ -71,22 +72,23 @@ def _load_ticker_map(force_refresh: bool = False) -> dict:
 
 
 def get_cik(ticker: str) -> str:
-    """Ticker (z.B. 'AAPL') -> zero-padded CIK-String."""
+    """Convert a ticker such as ``AAPL`` to a zero-padded CIK string."""
     ticker_map = _load_ticker_map()
     cik = ticker_map.get(ticker.upper())
     if cik is None:
-        # evtl. neu gelisteter Ticker -> Cache erzwungen refreshen
+        # Retry with a refreshed cache for newly listed tickers.
         ticker_map = _load_ticker_map(force_refresh=True)
         cik = ticker_map.get(ticker.upper())
     if cik is None:
-        raise ValueError(f"Ticker '{ticker}' nicht in SEC-Mapping gefunden.")
+        raise ValueError(f"Ticker '{ticker}' was not found in the SEC mapping.")
     return cik
 
 
 def get_recent_filings(ticker: str, form_types: tuple = ("10-K", "10-Q", "8-K"), limit: int = 10) -> list[dict]:
-    """
-    Holt die letzten `limit` Filings eines Tickers, gefiltert nach form_types.
-    Rückgabe: Liste von dicts mit form, filingDate, reportDate, accessionNumber, primaryDocument, url
+    """Fetch the latest filings for a ticker, filtered by form type.
+
+    Returns dictionaries containing ``form``, ``filingDate``, ``reportDate``,
+    ``accessionNumber``, ``primaryDocument``, and ``url``.
     """
     cik = get_cik(ticker)
     resp = requests.get(f"https://data.sec.gov/submissions/CIK{cik}.json", headers=HEADERS, timeout=10)
@@ -267,10 +269,10 @@ def get_saved_documents(ticker: str) -> list[dict]:
 
 
 def get_new_filings(ticker: str, form_types: tuple = ("10-K", "10-Q", "8-K"), limit: int = 25) -> list[dict]:
-    """
-    Diff-Scan: holt aktuelle Filings von EDGAR, vergleicht gegen die lokale
-    Historie und persistiert neue Eintraege. Gibt NUR die neuen Filings zurueck.
-    Bereits bekannte Filings bleiben unveraendert in der DB (Historie bleibt erhalten).
+    """Compare current EDGAR filings with local history and persist new entries.
+
+    Only new filings are returned. Existing filings remain unchanged in the
+    database so the local history is preserved.
     """
     cik = get_cik(ticker)
     candidates = get_recent_filings(ticker, form_types=form_types, limit=limit)
@@ -302,10 +304,9 @@ def get_new_filings(ticker: str, form_types: tuple = ("10-K", "10-Q", "8-K"), li
 
 
 def get_filing_history(ticker: str, form_types: tuple | None = None) -> list[dict]:
-    """
-    Liest die persistierte Historie eines Tickers aus der lokalen DB
-    (chronologisch nach report_date) - Basis fuer spaetere
-    Fundamentaldaten-Zeitreihenbetrachtung.
+    """Read a ticker's persisted filing history ordered by report date.
+
+    The history can later support fundamental-data time-series analysis.
     """
     conn = _get_conn()
     query = "SELECT * FROM filings WHERE ticker = ?"
@@ -325,15 +326,15 @@ def get_filing_history(ticker: str, form_types: tuple | None = None) -> list[dic
 
 
 if __name__ == "__main__":
-    # Quick manual test - nicht als CLI gedacht, nur zur lokalen Verifikation
-    print("--- Erster Lauf (alles ist neu) ---")
+    # Quick manual test; this is not intended to be a CLI.
+    print("--- First run (everything is new) ---")
     for f in get_new_filings("AAPL"):
         print(f["form"], f["filingDate"], f["reportDate"], f["url"])
 
-    print("--- Zweiter Lauf direkt danach (sollte leer sein) ---")
+    print("--- Second run immediately afterward (should be empty) ---")
     for f in get_new_filings("AAPL"):
         print(f["form"], f["filingDate"], f["reportDate"], f["url"])
 
-    print("--- Persistierte Historie ---")
+    print("--- Persisted history ---")
     for f in get_filing_history("AAPL"):
         print(f["form"], f["report_date"], f["accession_number"])

@@ -126,5 +126,3 @@ unsupported or missing metrics as quality flags instead of silently estimating.
 This project is intended **for testing and learning purposes only**. The market and fundamental data used are obtained from publicly available online sources and may be incomplete, outdated, or unavailable at any time. This project does **not constitute financial advice** and should not be used as a basis for real investment decisions. All predictions are based on experimental models with no guarantee of accuracy.
 
 ---
-
-**License:** MIT (or your preferred license)

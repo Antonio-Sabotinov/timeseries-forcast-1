@@ -1,7 +1,7 @@
 [project]
 name = "timeseries-project"
 version = "0.1.0"
-description = "Zeitreihenanalyse und Aktienprognose mit Nixtla, Darts und Ollama"
+description = "Time-series analysis and stock forecasting with Ollama"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -27,8 +27,7 @@ dev = ["pytest", "ruff", "black", "ipykernel"]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
-# Sagt setuptools, dass "utils" (im Projekt-Root) das zu installierende Package ist.
-# Falls du spaeter weitere Top-Level-Ordner mit __init__.py hinzufuegst (z.B. "models"),
-# einfach in der Liste ergaenzen.
+# Tell setuptools which packages in the project root should be installed.
+# Add future top-level packages with __init__.py to this list as needed.
 [tool.setuptools]
 packages = ["core", "core.fundamentals"]

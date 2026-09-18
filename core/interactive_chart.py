@@ -1,7 +1,6 @@
-"""
-Interaktives TradingView-Style Candlestick-Chart mit Plotly - fuer Jupyter-Notebooks.
+"""Interactive TradingView-style candlestick chart with Plotly for notebooks.
 
-Nutzung im Notebook:
+Usage in a notebook:
 
     from interactive_chart import build_chart
 
@@ -9,7 +8,7 @@ Nutzung im Notebook:
                        indicators=["sma", "rsi", "macd"])
     fig.show()
 
-Voraussetzungen:
+Requirements:
     uv pip install yfinance plotly pandas
 """
 
@@ -25,7 +24,7 @@ def load_data(ticker: str, interval: str, start: str, end: str | None) -> pd.Dat
     df = yf.download(ticker, interval=interval, start=start, end=end,
                       auto_adjust=True, progress=False)
     if df.empty:
-        raise ValueError(f"Keine Daten fuer {ticker} im Zeitraum {start} - {end} (Intervall {interval}).")
+        raise ValueError(f"No data found for {ticker} from {start} to {end} (interval {interval}).")
 
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
@@ -87,13 +86,13 @@ def get_data(
     indicators: list[str] | None = None,
 ) -> pd.DataFrame:
     """
-    Gibt die Roh- und Indikator-Daten als DataFrame zurueck - OHNE Chart.
-    Genau das, was du fuer Algorithmen/Backtesting/ML brauchst.
+    Return raw and indicator data as a DataFrame without building a chart.
+    This is the data interface for algorithms, backtesting, and ML.
 
     Spalten: ds, Open, High, Low, Close, Volume, + je nach indicators:
              SMA_20, SMA_50, EMA_12, EMA_26, BB_UPPER/MID/LOWER, RSI, MACD, MACD_SIGNAL, MACD_HIST
 
-    Beispiel:
+    Example:
         df = get_data("META", start="2024-01-01", indicators=["sma", "rsi", "macd"])
         df.to_csv("meta_data.csv", index=False)   # optional als Datei speichern
     """
@@ -126,15 +125,15 @@ def build_chart(
     indicators: list[str] | None = None,
 ) -> go.Figure:
     """
-    Baut ein interaktives Candlestick-Chart und gibt es zurueck.
-    Im Notebook einfach: fig = build_chart(...); fig.show()
+    Build and return an interactive candlestick chart.
+    In a notebook: ``fig = build_chart(...); fig.show()``
 
-    Fuer die Rohdaten als DataFrame nutze stattdessen get_data().
+    Use ``get_data()`` when raw data is needed as a DataFrame.
 
-    ticker:     z.B. "META"
+    ticker:     e.g. "META"
     interval:   "1d", "1h", "1wk", ...
     start/end:  "YYYY-MM-DD"
-    indicators: Liste aus "sma", "ema", "bbands", "rsi", "macd"
+    indicators: list of "sma", "ema", "bbands", "rsi", "macd"
     """
     df = get_data(ticker, interval=interval, start=start, end=end, indicators=indicators)
     indicators = [i.lower() for i in (indicators or [])]
@@ -212,8 +211,8 @@ def build_chart(
         )
         fig.update_yaxes(title_text="MACD", row=row_map["macd"], col=1)
 
-    fig.update_yaxes(title_text="Preis", row=row_map["price"], col=1)
-    fig.update_yaxes(title_text="Volumen", row=row_map["volume"], col=1)
+    fig.update_yaxes(title_text="Price", row=row_map["price"], col=1)
+    fig.update_yaxes(title_text="Volume", row=row_map["volume"], col=1)
 
     fig.update_xaxes(
         rangeslider_visible=False,
@@ -223,8 +222,8 @@ def build_chart(
                 dict(count=3, label="3M", step="month", stepmode="backward"),
                 dict(count=6, label="6M", step="month", stepmode="backward"),
                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-                dict(count=1, label="1J", step="year", stepmode="backward"),
-                dict(step="all", label="Alles"),
+                dict(count=1, label="1Y", step="year", stepmode="backward"),
+                dict(step="all", label="All"),
             ]
         ),
         row=1, col=1,
