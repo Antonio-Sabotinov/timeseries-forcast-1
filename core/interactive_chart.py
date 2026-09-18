@@ -94,12 +94,12 @@ def get_data(
 
     Example:
         df = get_data("META", start="2024-01-01", indicators=["sma", "rsi", "macd"])
-        df.to_csv("meta_data.csv", index=False)   # optional als Datei speichern
+        df.to_csv("meta_data.csv", index=False)   # optionally save to a file
     """
     indicators = [i.lower() for i in (indicators or [])]
     unknown = set(indicators) - VALID_INDICATORS
     if unknown:
-        raise ValueError(f"Unbekannte Indikatoren: {unknown}. Erlaubt: {VALID_INDICATORS}")
+        raise ValueError(f"Unknown indicators: {unknown}. Allowed: {VALID_INDICATORS}")
 
     df = load_data(ticker, interval, start, end)
 
